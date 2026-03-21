@@ -2,9 +2,27 @@ from flask import Flask, request, jsonify, render_template
 import json
 import os
 from datetime import datetime
+import sqlite3
 
 app = Flask(__name__)
 DATA_FILE = 'protectit/database/users.json'
+
+conn = sqlite3.connect('players.db', check_same_thread=False)
+cursor = conn.cursor()
+
+# Создание таблицы
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS players (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT,
+        lastname TEXT,
+        phone TEXT UNIQUE,
+        score1 INTEGER DEFAULT 0,
+        score2 INTEGER DEFAULT 0,
+        score3 INTEGER DEFAULT 0
+    )
+''')
+conn.commit()
 
 # Загружаем игроков из файла
 def load_players():
@@ -38,36 +56,19 @@ def stage3():
 @app.route('/register', methods=['POST'])
 def register():
     data = request.json
-    name = data.get('name')
-    lastname = data.get('lastname')
-    phone = data.get('phone')
+    name = data['name']
+    lastname = data['lastname']
+    phone = data['phone']
     
-    if not name or not lastname or not phone:
-        return jsonify({'status': 'error', 'message': 'Не все поля заполнены'}), 400
-    
-    players = load_players()
-    
-    # Проверяем, есть ли уже такой телефон
-    for player in players:
-        if player['phone'] == phone:
-            return jsonify({'status': 'error', 'message': 'Этот номер уже зарегистрирован'}), 400
-
-    
-    # Новый игрок
-    new_id = len(players) + 1
-    new_player = {
-        'id': new_id,
-        'name': name,
-        'lastname': lastname,
-        'phone': phone,
-        'score': 0,
-        'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    }
-    
-    players.append(new_player)
-    save_players(players)
-    
-    return jsonify({'status': 'ok', 'player_id': new_id})
+    try:
+        cursor.execute('INSERT INTO players (name, lastname, phone) VALUES (?, ?, ?)',
+                       (name, lastname, phone))
+        conn.commit()
+        conn.close()
+        return jsonify({'status': 'ok', 'id': cursor.lastrowid})
+    except sqlite3.IntegrityError:
+        conn.close()
+        return jsonify({'status': 'error', 'message': 'Телефон уже зарегистрирован'}), 400
 
 
 if __name__ == '__main__':
