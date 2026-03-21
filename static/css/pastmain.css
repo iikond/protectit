@@ -1,0 +1,223 @@
+.poppins-extrabold {
+  font-family: "Poppins", sans-serif;
+  font-weight: 800;
+  font-style: normal;
+}
+
+.poppins-regular {
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.poppins-medium {
+  font-family: "Poppins", sans-serif;
+  font-weight: 500;
+  font-style: normal;
+}
+
+.poppins-bold {
+  font-family: "Poppins", sans-serif;
+  font-weight: 700;
+  font-style: normal;
+}
+
+*{
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: "Poppins", sans-serif;
+    font-weight: 400;
+    color: rgb(255, 255, 255);
+    font-size: 16px;
+}
+
+a {
+    text-decoration: none; /*все ссылки будут без нижнего текста*/
+}
+
+img {
+    max-width: 100%; /*все изображения не вылазят из род блока*/
+}
+
+.wapper{ /*градиент экрана*/
+    background: #1F4A70;
+    background: linear-gradient(0deg, #1F4A70, #010101);
+    min-height: 100vh;
+    width: 100%;
+}
+
+.container{  /*отступы*/
+    width: 1400px;
+    margin: 0 auto;
+}
+
+header{  /*верх отступы*/
+    padding: 50px;
+}
+
+header .logo{
+    text-transform: uppercase;
+    font-size: 29px;
+    font-weight: 800;
+}
+
+header nav{
+    float: right;
+    width: 50%;
+    font-weight: 500;
+}
+header nav ul{
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+}
+
+header nav ul li{
+    display: inline-block;
+}
+
+
+header nav ul li a{
+    color: rgb(255, 255, 255);
+}
+
+header nav ul li.active::after{
+    content: '';
+    display: block;
+    width: 40px;
+    height: 5px;
+    background: #DC7000;
+    border-radius: 10px;
+}
+
+header nav ul li:not(.active):not(.button) a:hover{ /*эффект при наведении :hover*/
+    border-bottom: 5px solid #DC7000;
+    border-radius: 2px;
+
+}
+
+header nav ul li.button a{
+    background: #DC7000;
+    padding: 9px 17px;
+    border-radius: 5px; /*скругление*/
+    transition: all 500ms ease; /*плавность трасформации*/
+
+}
+
+header nav ul li.button a:hover{
+    background: #bf2105;
+}
+
+/*Далее секция с текстом и презентацией*/
+
+.hero{
+    padding-bottom: 100px;
+}
+
+.hero--info{
+    width: 530px;
+    padding-top: 70px;
+}
+
+.hero--info h2{
+    color: #dc7000;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.hero--info h1{
+    font-size: 50px;
+    font-weight: 600;
+}
+
+.hero--info p{
+    font-weight: 500;
+    line-height: 170%;
+    margin:30px 0;
+}
+
+.hero--info .button{
+    background: #DC7000;
+    color: #ffff;
+    border-radius: 50px;
+    padding: 15px 30px;
+    border: 0;
+    transition: all 500ms ease;
+}
+
+.hero--info .button:hover{
+    cursor: pointer;
+    transform: scale(1.1);
+}
+
+.hero--img{
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    top: 150px;
+    right: 100px;
+}
+
+/* Модальное окно (фон) */
+.modal {
+    display: none; /* Скрыто по умолчанию */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.7);
+}
+
+/* Контент попапа */
+.modal-content {
+    background-color: #1a1a1a;
+    margin: 15% auto;
+    padding: 20px;
+    border: 2px solid #DC7000;
+    border-radius: 12px;
+    width: 300px;
+    text-align: center;
+    color: #fff;
+    position: relative;
+}
+
+/* Кнопка закрытия */
+.close {
+    color: #DC7000;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover {
+    color: #fff;
+}
+
+/* Форма */
+#registerForm input {
+    width: 90%;
+    padding: 8px;
+    margin: 8px 0;
+    background: #2a2a2a;
+    border: 1px solid #DC7000;
+    color: #fff;
+    border-radius: 4px;
+}
+
+#registerForm button {
+    background: #DC7000;
+    color: #000;
+    border: none;
+    padding: 10px;
+    width: 100%;
+    margin-top: 10px;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+}
