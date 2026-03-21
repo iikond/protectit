@@ -27,6 +27,14 @@ def index():
 def stage1():
     return render_template('games/game1/game1.html')
 
+@app.route('/stage2')
+def stage2():
+    return render_template('games/game2/game2.html')
+
+@app.route('/stage3')
+def stage3():
+    return render_template('games/game3/game3.html')
+
 @app.route('/register', methods=['POST'])
 def register():
     data = request.json
