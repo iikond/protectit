@@ -1,0 +1,78 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(0deg, #1F4A70, #010101);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+}
+.game-container {
+    text-align: center;
+    background: rgba(0,0,0,0.6);
+    padding: 30px;
+    border-radius: 20px;
+    width: 650px;
+}
+h1 {
+    color: #DC7000;
+}
+.stats {
+    display: flex;
+    justify-content: space-between;
+    background: #0a1a2a;
+    padding: 12px 20px;
+    border-radius: 40px;
+    margin: 20px 0;
+    font-weight: 600;
+}
+.attack-message {
+    background: #1f3a48;
+    padding: 15px;
+    border-radius: 20px;
+    margin: 15px 0;
+    font-weight: bold;
+    border-left: 8px solid #DC7000;
+}
+.defense-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin: 20px 0;
+}
+.defense-btn {
+    background: #DC7000;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 40px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+    font-size: 1rem;
+}
+.defense-btn:hover {
+    background: #bf2105;
+    transform: scale(1.02);
+}
+.restart, .back-link {
+    background: #DC7000;
+    color: white;
+    padding: 8px 20px;
+    border-radius: 30px;
+    text-decoration: none;
+    display: inline-block;
+    margin: 10px;
+    font-weight: bold;
+}
+#gameOverMsg {
+    font-size: 1.2rem;
+    margin: 15px;
+}

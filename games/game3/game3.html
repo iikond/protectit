@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Protect!T - Rate Limit Defender</title>
+    <link rel="stylesheet" href="game3.css">
+</head>
+<body>
+    <div class="game-container">
+        <h1>⛓️ Rate Limit Defender</h1>
+        <p>Выбери защиту, чтобы снизить нагрузку на сервер!</p>
+        <div class="stats">
+            <div>Нагрузка: <span id="load">0</span>%</div>
+            <div>Защищено атак: <span id="score">0</span></div>
+            <div>Время: <span id="timer">60</span> с</div>
+        </div>
+        <div class="attack-message" id="attackMsg">⚡ Готовься к атаке...</div>
+        <div class="defense-buttons">
+            <button data-defense="rate" class="defense-btn">🚦 Rate Limiting</button>
+            <button data-defense="captcha" class="defense-btn">🤖 CAPTCHA</button>
+            <button data-defense="bandwidth" class="defense-btn">📡 Upgrade Bandwidth</button>
+        </div>
+        <div id="gameOverMsg"></div>
+        <button id="restartBtn" class="restart">🔁 Сыграть снова</button>
+        <a href="../index.html" class="back-link">← На главную</a>
+    </div>
+    <script src="game3.js"></script>
+</body>
+</html>
