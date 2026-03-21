@@ -1,11 +1,11 @@
 // Получаем элементы
 const modal = document.getElementById('registerModal');
-const btn = document.getElementById('showRegBtn');
+const reg_btn = document.getElementById('showRegBtn');
 const span = document.getElementsByClassName('close')[0];
 const form = document.getElementById('registerForm');
 
 // Открыть попап
-btn.onclick = function() {
+reg_btn.onclick = function() {
     modal.style.display = 'block';
 }
 
