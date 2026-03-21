@@ -3,10 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <title>Protect!T - Firewall Defender</title>
-    <link rel="stylesheet" href="game2.css">
+    <link rel="stylesheet" href="/static/css/game2.css">
 </head>
 <body>
     <div class="game-container">
+        <header class="container">
+            <span class="logo">Protect!T</span>
+            <nav>
+                <ul>
+                    <li><a href="/templates/index.html">Rules</a></li>
+                    <li><a href="/templates/games/game1/game1.html">First round</a></li>
+                    <liclass="active"><a href="">Second round</a></li>
+                    <li><a href="/templates/games/game3/game3.html">Third round</a></li>
+                    <li class="button"><a href="#" id="contactBtn">Contacts</a></li>
+                </ul>
+            </nav>
+        </header>
         <h1>🔥 Firewall Defender</h1>
         <p>Нажми "Блокировать" на IP-адресе, который выполняет DDoS-атаку!</p>
         <div class="stats">
@@ -15,9 +27,8 @@
         </div>
         <div id="ipPanel" class="ip-panel"></div>
         <div id="gameOverMsg"></div>
-        <button id="restartBtn" class="restart">🔁 Сыграть снова</button>
         <a href="../index.html" class="back-link">← На главную</a>
     </div>
-    <script src="game2.js"></script>
+    <script src="/static/js/game2.js"></script>
 </body>
 </html>

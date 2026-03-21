@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Protect!T - Packet Inspector</title>
-    <link rel="stylesheet" href="static/css/game1.css">
+    <link rel="stylesheet" href="/static/css/game1.css">
 </head>
 <body>
     <div class="game-container">
@@ -12,10 +12,10 @@
             <span class="logo">Protect!T</span>
             <nav>
                 <ul>
-                    <li><a href="../index.html">Rules</a></li>
+                    <li><a href="/templates/index.html">Rules</a></li>
                     <li class="active"><a href="#">First round</a></li>
-                    <li><a href="game2.html">Second round</a></li>
-                    <li><a href="game3.html">Third round</a></li>
+                    <li><a href="/templates/games/game2/game2.html">Second round</a></li>
+                    <li><a href="/templates/games/game3/game3.html">Third round</a></li>
                     <li class="button"><a href="#" id="contactBtn">Contacts</a></li>
                 </ul>
             </nav>
@@ -30,11 +30,10 @@
         </div>
         <canvas id="gameCanvas" width="900" height="400"></canvas>
         <div id="gameOverMsg"></div>
-        <button id="restartBtn" class="restart">🔁 Сыграть снова</button>
-        <a href="../index.html" class="back-link">← На главную</a>
-        <P><button href="../games/game2/game2.html" class="button">Следующая игра</button></P>
+        <a href="/templates/index.html" class="back-link">← На главную</a>
+        <P><button href="/templates/games/game2/game2.html" class="button">Следующая игра</button></P>
     </div>
-    <script src="game1.js"></script>
+    <script src="/static/js/game1.js"></script>
     
 </body>
 </html>
