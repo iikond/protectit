@@ -64,3 +64,65 @@ canvas {
     background: #bf2105;
     transform: scale(1.02);
 }
+
+.container{  /*отступы*/
+    width: 1400px;
+    margin: 0 auto;
+}
+
+header{  /*верх отступы*/
+    padding: 50px;
+}
+
+header .logo{
+    text-transform: uppercase;
+    font-size: 29px;
+    font-weight: 800;
+}
+
+header nav{
+    float: right;
+    width: 50%;
+    font-weight: 500;
+}
+header nav ul{
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+}
+
+header nav ul li{
+    display: inline-block;
+}
+
+
+header nav ul li a{
+    color: rgb(255, 255, 255);
+}
+
+header nav ul li.active::after{
+    content: '';
+    display: block;
+    width: 40px;
+    height: 5px;
+    background: #DC7000;
+    border-radius: 10px;
+}
+
+header nav ul li:not(.active):not(.button) a:hover{ /*эффект при наведении :hover*/
+    border-bottom: 5px solid #DC7000;
+    border-radius: 2px;
+
+}
+
+header nav ul li.button a{
+    background: #DC7000;
+    padding: 9px 17px;
+    border-radius: 5px; /*скругление*/
+    transition: all 500ms ease; /*плавность трасформации*/
+
+}
+
+header nav ul li.button a:hover{
+    background: #bf2105;
+}
