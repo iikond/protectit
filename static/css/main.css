@@ -146,6 +146,7 @@ header nav ul li.button a:hover{
     padding: 15px 30px;
     border: 0;
     transition: all 500ms ease;
+    
 }
 
 .hero--info .button:hover{
