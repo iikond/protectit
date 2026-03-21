@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Protect!T - Packet Inspector</title>
+    <link rel="stylesheet" href="game1.css">
+</head>
+<body>
+    <div class="game-container">
+        <h1>🛡️ Packet Inspector</h1>
+        <p>Кликай на красные пакеты (атака), не трогай зелёные!</p>
+        <div class="stats">
+            <div>Счёт: <span id="score">0</span></div>
+            <div>Здоровье сервера: <span id="health">100</span>%</div>
+            <div>Время: <span id="timer">60</span> с</div>
+        </div>
+        <canvas id="gameCanvas" width="900" height="400"></canvas>
+        <div id="gameOverMsg"></div>
+        <button id="restartBtn" class="restart">🔁 Сыграть снова</button>
+        <a href="../index.html" class="back-link">← На главную</a>
+    </div>
+    <script src="game1.js"></script>
+</body>
+</html>
