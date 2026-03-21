@@ -23,6 +23,10 @@ def save_players(players):
 def index():
     return render_template('index.html')
 
+@app.route('/stage1')
+def stage1():
+    return render_template('games/game1/game1.html')
+
 @app.route('/register', methods=['POST'])
 def register():
     data = request.json

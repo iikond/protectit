@@ -188,7 +188,7 @@ header nav ul li.button a:hover{
 
 /* Кнопка закрытия */
 .close {
-    color: #1f33cc;
+    color: #DC7000;
     float: right;
     font-size: 28px;
     font-weight: bold;
@@ -217,6 +217,7 @@ header nav ul li.button a:hover{
     padding: 10px;
     width: 100%;
     margin-top: 10px;
+    border-radius: 4px;
     font-weight: bold;
     cursor: pointer;
 }
