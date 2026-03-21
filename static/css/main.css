@@ -178,7 +178,7 @@ header nav ul li.button a:hover{
     background-color: #1a1a1a;
     margin: 15% auto;
     padding: 20px;
-    border: 2px solid #1f33cc;
+    border: 2px solid #DC7000;
     border-radius: 12px;
     width: 300px;
     text-align: center;
@@ -188,7 +188,7 @@ header nav ul li.button a:hover{
 
 /* Кнопка закрытия */
 .close {
-    color: #1f33cc;
+    color: #DC7000;
     float: right;
     font-size: 28px;
     font-weight: bold;
@@ -205,13 +205,13 @@ header nav ul li.button a:hover{
     padding: 8px;
     margin: 8px 0;
     background: #2a2a2a;
-    border: 1px solid #1f33cc;
+    border: 1px solid #DC7000;
     color: #fff;
     border-radius: 4px;
 }
 
 #registerForm button {
-    background: #1f33cc;
+    background: #DC7000;
     color: #000;
     border: none;
     padding: 10px;
