@@ -17,9 +17,10 @@ body {
 .game-container {
     text-align: center;
     background: rgba(0,0,0,0.6);
-    padding: 30px;
+    padding: 20px;
     border-radius: 20px;
-    width: 700px;
+    width: 1000px;
+    margin: 20px;
 }
 h1 {
     color: #DC7000;
@@ -80,4 +81,47 @@ h1 {
 #gameOverMsg {
     font-size: 1.3rem;
     margin: 15px;
+}
+
+/*Шапка (адаптированная под игру) */
+.container {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+}
+header {
+    padding: 20px 0;
+}
+header .logo {
+    font-size: 29px;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+header nav ul {
+    list-style: none;
+    display: flex;
+    gap: 30px;
+    align-items: center;
+}
+header nav ul li a {
+    color: white;
+    text-decoration: none;
+}
+header nav ul li.active::after {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 5px;
+    background: #DC7000;
+    border-radius: 10px;
+    margin-top: 5px;
+}
+
+.button {
+    color: #ffff;
+    text-decoration: none;
 }
