@@ -65,64 +65,45 @@ canvas {
     transform: scale(1.02);
 }
 
-.container{  /*отступы*/
-    width: 1400px;
+/*Шапка (адаптированная под игру) */
+.container {
+    width: 100%;
+    max-width: 1400px;
     margin: 0 auto;
-}
-
-header{  /*верх отступы*/
-    padding: 50px;
-}
-
-header .logo{
-    text-transform: uppercase;
-    font-size: 29px;
-    font-weight: 800;
-}
-
-header nav{
-    float: right;
-    width: 50%;
-    font-weight: 500;
-}
-header nav ul{
-    list-style: none;
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
 }
-
-header nav ul li{
-    display: inline-block;
+header {
+    padding: 20px 0;
 }
-
-
-header nav ul li a{
-    color: rgb(255, 255, 255);
+header .logo {
+    font-size: 29px;
+    font-weight: 800;
+    text-transform: uppercase;
 }
-
-header nav ul li.active::after{
+header nav ul {
+    list-style: none;
+    display: flex;
+    gap: 30px;
+    align-items: center;
+}
+header nav ul li a {
+    color: white;
+    text-decoration: none;
+}
+header nav ul li.active::after {
     content: '';
     display: block;
     width: 40px;
     height: 5px;
     background: #DC7000;
     border-radius: 10px;
+    margin-top: 5px;
 }
 
-header nav ul li:not(.active):not(.button) a:hover{ /*эффект при наведении :hover*/
-    border-bottom: 5px solid #DC7000;
-    border-radius: 2px;
-
-}
-
-header nav ul li.button a{
-    background: #DC7000;
-    padding: 9px 17px;
-    border-radius: 5px; /*скругление*/
-    transition: all 500ms ease; /*плавность трасформации*/
-
-}
-
-header nav ul li.button a:hover{
-    background: #bf2105;
+.button {
+    color: #ffff;
+    text-decoration: none;
 }
