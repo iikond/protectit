@@ -88,10 +88,4 @@ function endGame(msg) {
     document.getElementById('gameOverMsg').innerHTML = `<span style="color:#DC7000">${msg}</span>`;
 }
 
-document.getElementById('restartBtn').addEventListener('click', () => {
-    if (timerInterval) clearInterval(timerInterval);
-    if (timeoutId) clearTimeout(timeoutId);
-    startGame();
-});
-
 startGame();

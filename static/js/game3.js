@@ -108,10 +108,4 @@ function endGame(msg) {
     document.getElementById('attackMsg').innerHTML = "Игра окончена.";
 }
 
-document.getElementById('restartBtn').addEventListener('click', () => {
-    if (timerInterval) clearInterval(timerInterval);
-    if (attackTimer) clearTimeout(attackTimer);
-    startGame();
-});
-
 startGame();

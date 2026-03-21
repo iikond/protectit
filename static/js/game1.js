@@ -134,9 +134,4 @@ function endGame(msg) {
     document.getElementById('gameOverMsg').innerHTML = `<span style="color:#DC7000">${msg}</span>`;
 }
 
-document.getElementById('restartBtn').addEventListener('click', () => {
-    endGame('');
-    startGame();
-});
-
 startGame();
