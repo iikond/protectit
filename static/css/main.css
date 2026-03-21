@@ -161,3 +161,63 @@ header nav ul li.button a:hover{
     top: 150px;
     right: 100px;
 }
+
+/* Модальное окно (фон) */
+.modal {
+    display: none; /* Скрыто по умолчанию */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.7);
+}
+
+/* Контент попапа */
+.modal-content {
+    background-color: #1a1a1a;
+    margin: 15% auto;
+    padding: 20px;
+    border: 2px solid #1f33cc;
+    border-radius: 12px;
+    width: 300px;
+    text-align: center;
+    color: #fff;
+    position: relative;
+}
+
+/* Кнопка закрытия */
+.close {
+    color: #1f33cc;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover {
+    color: #fff;
+}
+
+/* Форма */
+#registerForm input {
+    width: 90%;
+    padding: 8px;
+    margin: 8px 0;
+    background: #2a2a2a;
+    border: 1px solid #1f33cc;
+    color: #fff;
+    border-radius: 4px;
+}
+
+#registerForm button {
+    background: #1f33cc;
+    color: #000;
+    border: none;
+    padding: 10px;
+    width: 100%;
+    margin-top: 10px;
+    font-weight: bold;
+    cursor: pointer;
+}
