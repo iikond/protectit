@@ -482,3 +482,197 @@ canvas {
 .hidden {
     display: none;
 }
+
+/* ==================== АДАПТАЦИЯ ДЛЯ CANVAS И ИГР ==================== */
+
+/* Общие стили для игрового контейнера */
+.game-container {
+    text-align: center;
+    background: rgba(0,0,0,0.6);
+    padding: 20px;
+    border-radius: 20px;
+    width: 100%;
+    max-width: 1000px;
+    margin: 20px auto;
+    box-sizing: border-box;
+}
+
+/* Адаптивный canvas */
+#gameCanvas {
+    display: block;
+    margin: 10px auto;
+    border: 3px solid var(--primary-orange);
+    border-radius: 16px;
+    cursor: crosshair;
+    max-width: 100%;
+    height: auto;
+    background: #0f212f;
+}
+
+/* Медиа-запросы для разных устройств */
+@media (max-width: 1024px) {
+    .game-container {
+        width: 95%;
+        padding: 15px;
+    }
+    
+    #gameCanvas {
+        width: 100%;
+        height: auto;
+    }
+    
+    .stats {
+        font-size: 14px;
+        gap: 15px;
+    }
+}
+
+@media (max-width: 768px) {
+    .game-container {
+        padding: 10px;
+        margin: 10px auto;
+    }
+    
+    h1 {
+        font-size: 24px;
+    }
+    
+    .stats {
+        flex-direction: column;
+        gap: 8px;
+        padding: 12px;
+        font-size: 14px;
+    }
+    
+    .stats div {
+        display: flex;
+        justify-content: space-between;
+        padding: 0 20px;
+    }
+    
+    #gameCanvas {
+        min-height: 250px;
+    }
+    
+    .back-link, .button {
+        padding: 8px 16px;
+        font-size: 14px;
+        margin: 5px;
+    }
+    
+    .defense-buttons {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .defense-btn {
+        width: 90%;
+        padding: 10px;
+        font-size: 14px;
+    }
+    
+    .ip-card {
+        width: 100%;
+        max-width: 280px;
+        margin: 0 auto;
+    }
+    
+    .attack-message {
+        font-size: 14px;
+        padding: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .game-container {
+        padding: 8px;
+    }
+    
+    h1 {
+        font-size: 20px;
+    }
+    
+    .stats {
+        font-size: 12px;
+    }
+    
+    .stats div {
+        padding: 0 10px;
+    }
+    
+    #gameCanvas {
+        min-height: 200px;
+    }
+    
+    .back-link, .button {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+    
+    .ip-address {
+        font-size: 14px;
+        word-break: break-all;
+    }
+    
+    .block-btn {
+        padding: 6px 15px;
+        font-size: 12px;
+    }
+}
+
+/* Для горизонтальной ориентации на мобильных */
+@media (max-width: 900px) and (orientation: landscape) {
+    .game-container {
+        margin: 5px auto;
+        padding: 10px;
+    }
+    
+    h1 {
+        font-size: 20px;
+        margin-bottom: 5px;
+    }
+    
+    .stats {
+        margin: 5px 0;
+        padding: 8px;
+    }
+    
+    #gameCanvas {
+        min-height: 180px;
+    }
+    
+    .back-link, .button {
+        padding: 5px 10px;
+        font-size: 12px;
+    }
+}
+
+/* Анимации для плавности */
+canvas, .button, .defense-btn, .block-btn {
+    transition: all 0.2s ease;
+}
+
+/* Подсказка для мобильных */
+@media (hover: none) and (pointer: coarse) {
+    .game-container::before {
+        content: "👆 Нажми на красные пакеты!";
+        display: block;
+        background: rgba(220, 112, 0, 0.8);
+        color: white;
+        padding: 8px;
+        border-radius: 20px;
+        margin-bottom: 10px;
+        font-size: 12px;
+        animation: pulse 1.5s infinite;
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}

@@ -2,9 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Protect!T - Packet Inspector</title>
     <link rel="stylesheet" href="../../../static/css/main.css">
+    <link rel="icon" href="../../../static/img/Ver1.png">
 </head>
 <body>
     <div class="game-container">
@@ -14,26 +15,32 @@
                 <ul>
                     <li><a href="/">Rules</a></li>
                     <li class="active"><a href="#">First round</a></li>
-                    <li><a href="stage2">Second round</a></li>
-                    <li><a href="stage3">Third round</a></li>
+                    <li><a href="../stage2">Second round</a></li>
+                    <li><a href="../stage3">Third round</a></li>
                     <li class="button"><a href="#" id="contactBtn">Contacts</a></li>
                 </ul>
             </nav>
         </header>
 
         <h1>🛡️ Packet Inspector</h1>
-        <p>Кликай на красные пакеты (атака), не трогай зелёные!</p>
+        <p class="game-description">Кликай на <span style="color: #ff6b6b;">🔴 КРАСНЫЕ пакеты</span> (атака), не трогай <span style="color: #4caf50;">🟢 ЗЕЛЁНЫЕ</span>!</p>
+        
         <div class="stats">
-            <div>Счёт: <span id="score">0</span></div>
-            <div>Здоровье сервера: <span id="health">100</span>%</div>
-            <div>Время: <span id="timer">60</span> с</div>
+            <div>📊 Счёт: <span id="score">0</span></div>
+            <div>❤️ Здоровье сервера: <span id="health">100</span>%</div>
+            <div>⏱️ Время: <span id="timer">60</span> с</div>
         </div>
+        
         <canvas id="gameCanvas" width="900" height="400"></canvas>
+        
         <div id="gameOverMsg"></div>
-        <a href="/" class="back-link">← На главную</a>
-        <P><button href="stage2" class="button">Следующая игра</button></P>
+        
+        <div class="game-buttons">
+            <a href="/" class="back-link">🏠 На главную</a>
+            <button id="nextGameBtn" class="button">🎮 Следующая игра →</button>
+        </div>
     </div>
-    <script src="../../../static/js/game1.js"></script>
     
+    <script src="../../../static/js/game1.js"></script>
 </body>
 </html>

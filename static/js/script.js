@@ -4,9 +4,20 @@ const reg_btn = document.getElementById('showRegBtn');
 const span = document.getElementsByClassName('close')[0];
 const form = document.getElementById('registerForm');
 
-// Открыть попап
+// Проверяем, зарегистрирован ли пользователь
+function isRegistered() {
+    return localStorage.getItem('player_id') !== null;
+}
+
+// Обработчик кнопки "Играть"
 reg_btn.onclick = function() {
-    modal.style.display = 'block';
+    if (isRegistered()) {
+        // Если уже зареган — сразу в игру
+        window.location.href = '/stage1';
+    } else {
+        // Если нет — показать попап регистрации
+        document.getElementById('registerModal').style.display = 'block';
+    }
 }
 
 // Закрыть по крестику
@@ -43,11 +54,17 @@ form.onsubmit = function(e) {
     .then(response => response.json())
     .then(data => {
         if (data.status === 'ok') {
+            // Сохраняем ID игрока в localStorage
+            localStorage.setItem('player_id', data.id);
             modal.style.display = 'none';
             // Запускаем игру
-            startGame();
+            window.location.href = '/stage1';
         } else {
             alert('Ошибка регистрации');
         }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Ошибка соединения с сервером');
     });
 }
