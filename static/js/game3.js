@@ -14,15 +14,76 @@ const attackMessages = [
     { text: "🌊 Амплификационная атака DNS!", correct: "bandwidth", increase: 30, decrease: 25 }
 ];
 
+// Функция проверки регистрации на сервере
+async function checkAndFixRegistration() {
+    const playerId = localStorage.getItem('player_id');
+    if (!playerId) return false;
+    
+    try {
+        const response = await fetch(`/check_player/${playerId}`);
+        const data = await response.json();
+        
+        if (!data.exists) {
+            localStorage.removeItem('player_id');
+            alert('Ваша сессия устарела. Пожалуйста, зарегистрируйтесь заново.');
+            window.location.href = '/';
+            return false;
+        }
+        return true;
+    } catch (error) {
+        console.error('Error checking player:', error);
+        return false;
+    }
+}
+
+// Функция отправки очков на сервер
+async function submitScore(finalScore) {
+    const isValid = await checkAndFixRegistration();
+    if (!isValid) return;
+    
+    const playerId = localStorage.getItem('player_id');
+    if (!playerId) {
+        console.log('Пользователь не зарегистрирован');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/update_score', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                player_id: playerId,
+                game: 'game3',
+                score: finalScore
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.status === 'ok') {
+            console.log('✅ Score saved successfully!');
+        } else if (data.status === 'error' && data.message.includes('not found')) {
+            localStorage.removeItem('player_id');
+            alert('Ваша сессия устарела. Пожалуйста, зарегистрируйтесь заново.');
+            window.location.href = '/';
+        } else {
+            console.error('Error saving score:', data.message);
+        }
+    } catch (error) {
+        console.error('Network error:', error);
+    }
+}
+
 function getRandomAttack() {
     const attack = attackMessages[Math.floor(Math.random() * attackMessages.length)];
-    return { ...attack }; // Создаем копию
+    return { ...attack };
 }
 
 function triggerAttack() {
     if (!gameActive) return;
     
-    // Очищаем предыдущий таймер
     if (attackTimer) {
         clearTimeout(attackTimer);
         attackTimer = null;
@@ -32,17 +93,14 @@ function triggerAttack() {
     document.getElementById('attackMsg').innerHTML = `⚠️ ${currentAttack.text} ⚠️`;
     document.getElementById('attackMsg').style.borderLeftColor = '#ff4444';
     
-    // Таймер на ответ (3 секунды)
     attackTimer = setTimeout(() => {
         if (gameActive && currentAttack) {
-            // Не ответили вовремя - нагрузка растет
             load = Math.min(100, load + currentAttack.increase);
             updateUI();
             
             if (load >= 100) {
                 endGame("💀 Сервер перегружен! Вы не успели защититься! 💀");
             } else {
-                // Запускаем следующую атаку
                 triggerAttack();
             }
         }
@@ -54,7 +112,6 @@ function updateUI() {
     document.getElementById('score').innerText = score;
     document.getElementById('timer').innerText = timeLeft;
     
-    // Меняем цвет нагрузки
     const loadElement = document.getElementById('load');
     if (load >= 80) {
         loadElement.style.color = '#ff4444';
@@ -72,18 +129,15 @@ function handleDefense(defenseType) {
         return;
     }
     
-    // Очищаем таймер атаки
     if (attackTimer) {
         clearTimeout(attackTimer);
         attackTimer = null;
     }
     
     if (defenseType === currentAttack.correct) {
-        // Успешная защита
         load = Math.max(0, load - currentAttack.decrease);
         score++;
         
-        // Визуальный эффект успеха
         document.getElementById('attackMsg').innerHTML = `✅ УСПЕШНО! ${currentAttack.text} отражена! +${currentAttack.decrease}% к разгрузке`;
         document.getElementById('attackMsg').style.borderLeftColor = '#4caf50';
         
@@ -94,7 +148,6 @@ function handleDefense(defenseType) {
             updateUI();
         }
         
-        // Запускаем следующую атаку через 1 секунду
         setTimeout(() => {
             if (gameActive) {
                 triggerAttack();
@@ -102,18 +155,15 @@ function handleDefense(defenseType) {
         }, 1000);
         
     } else {
-        // Неправильная защита
         load = Math.min(100, load + 15);
         updateUI();
         
-        // Визуальный эффект ошибки
         document.getElementById('attackMsg').innerHTML = `❌ НЕВЕРНО! ${currentAttack.text} НЕ отражена! +15% к нагрузке`;
         document.getElementById('attackMsg').style.borderLeftColor = '#ff4444';
         
         if (load >= 100) {
             endGame("💀 Неверная защита! Сервер пал под атакой! 💀");
         } else {
-            // Запускаем следующую атаку через 1.5 секунды
             setTimeout(() => {
                 if (gameActive) {
                     triggerAttack();
@@ -142,7 +192,6 @@ function startGame() {
     document.getElementById('attackMsg').innerHTML = '⚡ Готовься к атаке...';
     document.getElementById('attackMsg').style.borderLeftColor = 'var(--primary-orange)';
     
-    // Таймер игры
     timerInterval = setInterval(() => {
         if (gameActive && timeLeft > 0) {
             timeLeft--;
@@ -154,17 +203,14 @@ function startGame() {
         }
     }, 1000);
     
-    // Запускаем первую атаку через 1 секунду
     setTimeout(() => {
         if (gameActive) {
             triggerAttack();
         }
     }, 1000);
     
-    // Назначаем обработчики кнопок
     const btns = document.querySelectorAll('.defense-btn');
     btns.forEach(btn => {
-        // Убираем старые обработчики
         const newBtn = btn.cloneNode(true);
         btn.parentNode.replaceChild(newBtn, btn);
         
@@ -188,7 +234,6 @@ function endGame(msg) {
     document.getElementById('gameOverMsg').innerHTML = `<span style="color:#DC7000; font-size: 28px; text-shadow: 0 0 10px rgba(220,112,0,0.5);">${msg}</span>`;
     document.getElementById('attackMsg').innerHTML = "🏁 Игра окончена 🏁";
     
-    // Блокируем кнопки
     const btns = document.querySelectorAll('.defense-btn');
     btns.forEach(btn => {
         btn.disabled = true;
@@ -196,11 +241,13 @@ function endGame(msg) {
         btn.style.cursor = 'not-allowed';
     });
     
-    // Сохраняем результат
+    // ✅ СОХРАНЯЕМ И ОТПРАВЛЯЕМ РЕЗУЛЬТАТ
     if (score > 0) {
         localStorage.setItem('game3_score', score);
+        submitScore(score); // Отправляем на сервер
+    } else {
+        console.log('Игра закончена со счетом 0, очки не отправляются');
     }
 }
 
-// Запускаем игру
 startGame();

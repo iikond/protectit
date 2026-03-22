@@ -264,6 +264,37 @@ function startGame() {
     gameLoop();
 }
 
+async function submitScore(finalScore) {
+    const playerId = localStorage.getItem('player_id');
+    if (!playerId) {
+        console.log('Пользователь не зарегистрирован');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/update_score', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                player_id: playerId,
+                game: 'game1',
+                score: finalScore
+            })
+        });
+        
+        const data = await response.json();
+        if (data.status === 'ok') {
+            console.log('Score saved successfully!');
+        } else {
+            console.error('Error saving score:', data.message);
+        }
+    } catch (error) {
+        console.error('Network error:', error);
+    }
+}
+
 function endGame(msg) {
     if (!gameActive) return;
     gameActive = false;
@@ -273,9 +304,9 @@ function endGame(msg) {
     const msgElement = document.getElementById('gameOverMsg');
     msgElement.innerHTML = `<span style="color:#DC7000; font-size: 24px; text-shadow: 0 0 10px rgba(220,112,0,0.5);">${msg}</span>`;
     
-    // Сохраняем результат в localStorage
     if (score > 0) {
         localStorage.setItem('game1_score', score);
+        submitScore(score); // ← Отправляем на сервер
     }
 }
 
@@ -297,6 +328,71 @@ if (nextBtn) {
 window.addEventListener('resize', () => {
     resizeCanvas();
 });
+
+// Добавьте эту функцию в game1.js и game3.js
+async function checkAndFixRegistration() {
+    const playerId = localStorage.getItem('player_id');
+    if (!playerId) return false;
+    
+    try {
+        const response = await fetch(`/check_player/${playerId}`);
+        const data = await response.json();
+        
+        if (!data.exists) {
+            // Игрок не существует в БД - очищаем localStorage
+            localStorage.removeItem('player_id');
+            alert('Ваша сессия устарела. Пожалуйста, зарегистрируйтесь заново.');
+            window.location.href = '/';
+            return false;
+        }
+        return true;
+    } catch (error) {
+        console.error('Error checking player:', error);
+        return false;
+    }
+}
+
+// Модифицируем функцию submitScore
+async function submitScore(finalScore) {
+    // Сначала проверяем регистрацию
+    const isValid = await checkAndFixRegistration();
+    if (!isValid) return;
+    
+    const playerId = localStorage.getItem('player_id');
+    if (!playerId) {
+        console.log('Пользователь не зарегистрирован');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/update_score', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                player_id: playerId,
+                game: 'game1', // или 'game3' для game3.js
+                score: finalScore
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.status === 'ok') {
+            console.log('✅ Score saved successfully!');
+        } else if (data.status === 'error' && data.message.includes('not found')) {
+            // Игрок не найден - очищаем localStorage
+            localStorage.removeItem('player_id');
+            alert('Ваша сессия устарела. Пожалуйста, зарегистрируйтесь заново.');
+            window.location.href = '/';
+        } else {
+            console.error('Error saving score:', data.message);
+        }
+    } catch (error) {
+        console.error('Network error:', error);
+    }
+}
 
 // Запускаем игру
 startGame();
