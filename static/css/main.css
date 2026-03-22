@@ -713,3 +713,29 @@ canvas, .button, .defense-btn, .block-btn {
 .table-wrapper .table {
     width: 100%;          /* таблица растянется на всю ширину обёртки */
 }
+
+.hero-image-right {
+    position: fixed;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 100;
+}
+
+.hero-image-right img {
+    max-width: 600px;
+    height: auto;
+}
+
+/* На мобильных картинка становится меньше и смещается */
+@media (max-width: 768px) {
+    .hero-image-right img {
+        max-width: 120px;
+    }
+    .hero-image-right {
+        top: auto;
+        bottom: 20px;
+        transform: none;
+        right: 10px;
+    }
+}
