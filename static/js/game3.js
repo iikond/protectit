@@ -15,97 +15,192 @@ const attackMessages = [
 ];
 
 function getRandomAttack() {
-    return { ...attackMessages[Math.floor(Math.random() * attackMessages.length)] };
+    const attack = attackMessages[Math.floor(Math.random() * attackMessages.length)];
+    return { ...attack }; // Создаем копию
 }
 
 function triggerAttack() {
     if (!gameActive) return;
+    
+    // Очищаем предыдущий таймер
+    if (attackTimer) {
+        clearTimeout(attackTimer);
+        attackTimer = null;
+    }
+    
     currentAttack = getRandomAttack();
     document.getElementById('attackMsg').innerHTML = `⚠️ ${currentAttack.text} ⚠️`;
-    // increase load
-    load = Math.min(100, load + currentAttack.increase);
-    updateUI();
-    if (load >= 100) {
-        endGame("Сервер перегружен! DDoS успешен.");
-    }
-    // auto fail if not defended in 4 seconds
-    if (attackTimer) clearTimeout(attackTimer);
+    document.getElementById('attackMsg').style.borderLeftColor = '#ff4444';
+    
+    // Таймер на ответ (3 секунды)
     attackTimer = setTimeout(() => {
         if (gameActive && currentAttack) {
+            // Не ответили вовремя - нагрузка растет
             load = Math.min(100, load + currentAttack.increase);
             updateUI();
-            if (load >= 100) endGame("Сервер перегружен!");
-            else triggerAttack(); // next attack
+            
+            if (load >= 100) {
+                endGame("💀 Сервер перегружен! Вы не успели защититься! 💀");
+            } else {
+                // Запускаем следующую атаку
+                triggerAttack();
+            }
         }
-    }, 4000);
+    }, 3000);
 }
 
 function updateUI() {
     document.getElementById('load').innerText = load;
     document.getElementById('score').innerText = score;
     document.getElementById('timer').innerText = timeLeft;
+    
+    // Меняем цвет нагрузки
+    const loadElement = document.getElementById('load');
+    if (load >= 80) {
+        loadElement.style.color = '#ff4444';
+        loadElement.style.fontWeight = 'bold';
+    } else if (load >= 50) {
+        loadElement.style.color = '#ffaa44';
+    } else {
+        loadElement.style.color = '#4caf50';
+    }
 }
 
 function handleDefense(defenseType) {
-    if (!gameActive || !currentAttack) return;
+    if (!gameActive || !currentAttack) {
+        console.log('Игра не активна или нет атаки');
+        return;
+    }
+    
+    // Очищаем таймер атаки
+    if (attackTimer) {
+        clearTimeout(attackTimer);
+        attackTimer = null;
+    }
+    
     if (defenseType === currentAttack.correct) {
-        // successful mitigation
+        // Успешная защита
         load = Math.max(0, load - currentAttack.decrease);
         score++;
+        
+        // Визуальный эффект успеха
+        document.getElementById('attackMsg').innerHTML = `✅ УСПЕШНО! ${currentAttack.text} отражена! +${currentAttack.decrease}% к разгрузке`;
+        document.getElementById('attackMsg').style.borderLeftColor = '#4caf50';
+        
         updateUI();
-        if (load <= 0) load = 0;
-        clearTimeout(attackTimer);
-        triggerAttack(); // next wave
+        
+        if (load <= 0) {
+            load = 0;
+            updateUI();
+        }
+        
+        // Запускаем следующую атаку через 1 секунду
+        setTimeout(() => {
+            if (gameActive) {
+                triggerAttack();
+            }
+        }, 1000);
+        
     } else {
-        // wrong defense: load increases more
-        load = Math.min(100, load + 10);
+        // Неправильная защита
+        load = Math.min(100, load + 15);
         updateUI();
-        if (load >= 100) endGame("Неверная защита! Атака прошла.");
-        else {
-            clearTimeout(attackTimer);
-            triggerAttack();
+        
+        // Визуальный эффект ошибки
+        document.getElementById('attackMsg').innerHTML = `❌ НЕВЕРНО! ${currentAttack.text} НЕ отражена! +15% к нагрузке`;
+        document.getElementById('attackMsg').style.borderLeftColor = '#ff4444';
+        
+        if (load >= 100) {
+            endGame("💀 Неверная защита! Сервер пал под атакой! 💀");
+        } else {
+            // Запускаем следующую атаку через 1.5 секунды
+            setTimeout(() => {
+                if (gameActive) {
+                    triggerAttack();
+                }
+            }, 1500);
         }
     }
+    
     currentAttack = null;
 }
 
 let timerInterval;
+
 function startGame() {
     gameActive = true;
     load = 20;
     score = 0;
     timeLeft = 60;
+    currentAttack = null;
+    
+    if (attackTimer) clearTimeout(attackTimer);
+    if (timerInterval) clearInterval(timerInterval);
+    
     updateUI();
     document.getElementById('gameOverMsg').innerHTML = '';
-    if (timerInterval) clearInterval(timerInterval);
+    document.getElementById('attackMsg').innerHTML = '⚡ Готовься к атаке...';
+    document.getElementById('attackMsg').style.borderLeftColor = 'var(--primary-orange)';
+    
+    // Таймер игры
     timerInterval = setInterval(() => {
         if (gameActive && timeLeft > 0) {
             timeLeft--;
             updateUI();
-            if (timeLeft <= 0) endGame("Победа! Выдержали 60 секунд!");
-        } else if (timeLeft <= 0) endGame("Победа!");
+            
+            if (timeLeft <= 0) {
+                endGame("🎉 ПОБЕДА! 🎉 Вы выдержали 60 секунд атак!");
+            }
+        }
     }, 1000);
-    triggerAttack();
-
+    
+    // Запускаем первую атаку через 1 секунду
+    setTimeout(() => {
+        if (gameActive) {
+            triggerAttack();
+        }
+    }, 1000);
+    
+    // Назначаем обработчики кнопок
     const btns = document.querySelectorAll('.defense-btn');
     btns.forEach(btn => {
-        btn.removeEventListener('click', defenseHandler);
-        btn.addEventListener('click', defenseHandler);
+        // Убираем старые обработчики
+        const newBtn = btn.cloneNode(true);
+        btn.parentNode.replaceChild(newBtn, btn);
+        
+        newBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const defense = newBtn.getAttribute('data-defense');
+            console.log('Нажата защита:', defense);
+            handleDefense(defense);
+        });
     });
-}
-
-function defenseHandler(e) {
-    const defense = e.target.getAttribute('data-defense');
-    handleDefense(defense);
 }
 
 function endGame(msg) {
     if (!gameActive) return;
+    
     gameActive = false;
-    clearInterval(timerInterval);
+    
+    if (timerInterval) clearInterval(timerInterval);
     if (attackTimer) clearTimeout(attackTimer);
-    document.getElementById('gameOverMsg').innerHTML = `<span style="color:#DC7000">${msg}</span>`;
-    document.getElementById('attackMsg').innerHTML = "Игра окончена.";
+    
+    document.getElementById('gameOverMsg').innerHTML = `<span style="color:#DC7000; font-size: 28px; text-shadow: 0 0 10px rgba(220,112,0,0.5);">${msg}</span>`;
+    document.getElementById('attackMsg').innerHTML = "🏁 Игра окончена 🏁";
+    
+    // Блокируем кнопки
+    const btns = document.querySelectorAll('.defense-btn');
+    btns.forEach(btn => {
+        btn.disabled = true;
+        btn.style.opacity = '0.5';
+        btn.style.cursor = 'not-allowed';
+    });
+    
+    // Сохраняем результат
+    if (score > 0) {
+        localStorage.setItem('game3_score', score);
+    }
 }
 
+// Запускаем игру
 startGame();
