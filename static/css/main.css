@@ -676,3 +676,40 @@ canvas, .button, .defense-btn, .block-btn {
         opacity: 0.7;
     }
 }
+
+/* ==================== Стили таблиц ==================== */
+
+.table {
+	width: 100%;
+	margin-bottom: 20px;
+	border-collapse: collapse; 
+}
+.table th {
+	font-weight: bold;
+	padding: 5px;
+	background: #efefef;
+	border: 1px solid #dddddd;
+}
+
+.table td {
+	border: 1px solid #dddddd;
+	padding: 5px;
+}
+
+.table tr td:first-child, .table tr th:first-child {
+	border-left: none;
+}
+
+.table tr td:last-child, .table tr th:last-child {
+	border-right: none;
+}
+
+.table-wrapper {
+    width: 50vw;          /* 50% от ширины окна */
+    margin-left: auto;    /* прижимаем вправо */
+    overflow-x: auto;     /* чтобы на мобильных не ломалась */
+}
+
+.table-wrapper .table {
+    width: 100%;          /* таблица растянется на всю ширину обёртки */
+}
