@@ -17,9 +17,7 @@ cursor.execute('''
         name TEXT,
         lastname TEXT,
         phone TEXT UNIQUE,
-        score1 INTEGER DEFAULT 0,
-        score2 INTEGER DEFAULT 0,
-        score3 INTEGER DEFAULT 0
+        score INTEGER DEFAULT 0
     )
 ''')
 conn.commit()
@@ -67,7 +65,6 @@ def register():
         conn.close()
         return jsonify({'status': 'ok', 'id': cursor.lastrowid})
     except sqlite3.IntegrityError:
-        conn.close()
         return jsonify({'status': 'error', 'message': 'Телефон уже зарегистрирован'}), 400
 
 
