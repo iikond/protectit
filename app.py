@@ -17,7 +17,9 @@ cursor.execute('''
         name TEXT,
         lastname TEXT,
         phone TEXT UNIQUE,
-        score INTEGER DEFAULT 0
+        game1_score INTEGER DEFAULT 0,
+        game2_score INTEGER DEFAULT 0,
+        game3_score INTEGER DEFAULT 0
     )
 ''')
 conn.commit()
@@ -67,6 +69,45 @@ def register():
     except sqlite3.IntegrityError:
         return jsonify({'status': 'error', 'message': 'Телефон уже зарегистрирован'}), 400
 
+@app.route('/update_score', methods=['POST'])
+def update_score():
+    try:
+        data = request.json
+        player_id = data.get('player_id')
+        game_number = data.get('game_number')  # 1, 2 или 3
+        score = data.get('score')
+        
+        if not player_id or not game_number or score is None:
+            return jsonify({'status': 'error', 'message': 'Missing data'}), 400
+        
+        conn = sqlite3.connect('players.db')
+        cursor = conn.cursor()
+        
+        # Обновляем счет в зависимости от игры
+        if game_number == 1:
+            cursor.execute('UPDATE players SET game1_score = ? WHERE id = ?', (score, player_id))
+        elif game_number == 2:
+            cursor.execute('UPDATE players SET game2_score = ? WHERE id = ?', (score, player_id))
+        elif game_number == 3:
+            cursor.execute('UPDATE players SET game3_score = ? WHERE id = ?', (score, player_id))
+        
+        conn.commit()
+        
+        # Получаем общий счет
+        cursor.execute('SELECT game1_score, game2_score, game3_score FROM players WHERE id = ?', (player_id,))
+        result = cursor.fetchone()
+        total_score = sum(filter(None, [result[0], result[1], result[2]])) if result else 0
+        
+        conn.close()
+        
+        return jsonify({
+            'status': 'ok',
+            'total_score': total_score,
+            'message': f'Score for game {game_number} updated!'
+        })
+        
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
