@@ -4,18 +4,32 @@ const reg_btn = document.getElementById('showRegBtn');
 const span = document.getElementsByClassName('close')[0];
 const form = document.getElementById('registerForm');
 
-// Проверяем, зарегистрирован ли пользователь
-function isRegistered() {
-    return localStorage.getItem('player_id') !== null;
+// Проверяем, зарегистрирован ли пользователь (с проверкой на сервере)
+async function isRegistered() {
+    const playerId = localStorage.getItem('player_id');
+    if (!playerId) return false;
+    
+    // Проверяем на сервере, существует ли такой игрок
+    try {
+        const response = await fetch(`/check_player/${playerId}`);
+        const data = await response.json();
+        return data.exists === true;
+    } catch (error) {
+        console.error('Error checking player:', error);
+        return false;
+    }
 }
 
 // Обработчик кнопки "Играть"
-reg_btn.onclick = function() {
-    if (isRegistered()) {
+reg_btn.onclick = async function() {
+    const registered = await isRegistered();
+    
+    if (registered) {
         // Если уже зареган — сразу в игру
         window.location.href = '/stage1';
     } else {
-        // Если нет — показать попап регистрации
+        // Если нет — очищаем localStorage и показываем попап
+        localStorage.removeItem('player_id');
         document.getElementById('registerModal').style.display = 'block';
     }
 }
@@ -33,7 +47,7 @@ window.onclick = function(event) {
 }
 
 // Обработка формы
-form.onsubmit = function(e) {
+form.onsubmit = async function(e) {
     e.preventDefault();
     
     const name = document.getElementById('name').value;
@@ -45,14 +59,16 @@ form.onsubmit = function(e) {
         return;
     }
     
-    // Отправляем данные на бэкенд
-    fetch('/register', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({name, lastname, phone})
-    })
-    .then(response => response.json())
-    .then(data => {
+    try {
+        // Отправляем данные на бэкенд
+        const response = await fetch('/register', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({name, lastname, phone})
+        });
+        
+        const data = await response.json();
+        
         if (data.status === 'ok') {
             // Сохраняем ID игрока в localStorage
             localStorage.setItem('player_id', data.id);
@@ -60,11 +76,18 @@ form.onsubmit = function(e) {
             // Запускаем игру
             window.location.href = '/stage1';
         } else {
-            alert('Ошибка регистрации');
+            alert(data.message || 'Ошибка регистрации');
         }
-    })
-    .catch(error => {
+    } catch (error) {
         console.error('Error:', error);
         alert('Ошибка соединения с сервером');
-    });
+    }
 }
+
+// При загрузке страницы проверяем валидность регистрации
+window.addEventListener('load', async function() {
+    const registered = await isRegistered();
+    if (!registered) {
+        localStorage.removeItem('player_id');
+    }
+});

@@ -1,41 +1,54 @@
 from flask import Flask, request, jsonify, render_template
-import json
-import os
-from datetime import datetime
 import sqlite3
+import os
 
 app = Flask(__name__)
-DATA_FILE = 'protectit/database/users.json'
+app.secret_key = 'your-secret-key-here-change-it'
 
-conn = sqlite3.connect('players.db', check_same_thread=False)
-cursor = conn.cursor()
+def get_db():
+    conn = sqlite3.connect('players.db')
+    conn.row_factory = sqlite3.Row
+    return conn
 
-# Создание таблицы
-cursor.execute('''
-    CREATE TABLE IF NOT EXISTS players (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT,
-        lastname TEXT,
-        phone TEXT UNIQUE,
-        game1_score INTEGER DEFAULT 0,
-        game2_score INTEGER DEFAULT 0,
-        game3_score INTEGER DEFAULT 0
-    )
-''')
-conn.commit()
+def init_db():
+    conn = get_db()
+    cursor = conn.cursor()
+    
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='players'")
+    table_exists = cursor.fetchone()
+    
+    if not table_exists:
+        cursor.execute('''
+            CREATE TABLE players (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                lastname TEXT NOT NULL,
+                phone TEXT UNIQUE NOT NULL,
+                game1_score INTEGER DEFAULT 0,
+                game2_score INTEGER DEFAULT 0,
+                game3_score INTEGER DEFAULT 0,
+                total_score INTEGER DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        print("✅ Таблица players создана")
+    else:
+        cursor.execute("PRAGMA table_info(players)")
+        columns = [col[1] for col in cursor.fetchall()]
+        
+        if 'game1_score' not in columns:
+            cursor.execute("ALTER TABLE players ADD COLUMN game1_score INTEGER DEFAULT 0")
+        if 'game2_score' not in columns:
+            cursor.execute("ALTER TABLE players ADD COLUMN game2_score INTEGER DEFAULT 0")
+        if 'game3_score' not in columns:
+            cursor.execute("ALTER TABLE players ADD COLUMN game3_score INTEGER DEFAULT 0")
+        if 'total_score' not in columns:
+            cursor.execute("ALTER TABLE players ADD COLUMN total_score INTEGER DEFAULT 0")
+    
+    conn.commit()
+    conn.close()
 
-# Загружаем игроков из файла
-def load_players():
-    if not os.path.exists(DATA_FILE):
-        return []
-    with open(DATA_FILE, 'r', encoding='utf-8') as f:
-        return json.load(f)
-
-# Сохраняем игроков
-def save_players(players):
-    os.makedirs(os.path.dirname(DATA_FILE), exist_ok=True)  # создаст папку, если нет
-    with open(DATA_FILE, 'w', encoding='utf-8') as f:
-        json.dump(players, f, indent=2, ensure_ascii=False)
+init_db()
 
 @app.route('/')
 def index():
@@ -53,58 +66,195 @@ def stage2():
 def stage3():
     return render_template('games/game3/game3.html')
 
+@app.route('/leaderboard')
+def leaderboard():
+    return render_template('leaderboard.html')
+
+@app.route('/check_player/<int:player_id>', methods=['GET'])
+def check_player(player_id):
+    """Проверяет, существует ли игрок в БД"""
+    try:
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute('SELECT id FROM players WHERE id = ?', (player_id,))
+        exists = cursor.fetchone() is not None
+        conn.close()
+        
+        return jsonify({'exists': exists})
+    except Exception as e:
+        print(f"❌ Ошибка проверки игрока: {e}")
+        return jsonify({'exists': False})
+
 @app.route('/register', methods=['POST'])
 def register():
-    data = request.json
-    name = data['name']
-    lastname = data['lastname']
-    phone = data['phone']
-    
     try:
-        cursor.execute('INSERT INTO players (name, lastname, phone) VALUES (?, ?, ?)',
-                       (name, lastname, phone))
+        data = request.json
+        name = data.get('name')
+        lastname = data.get('lastname')
+        phone = data.get('phone')
+        
+        if not all([name, lastname, phone]):
+            return jsonify({'status': 'error', 'message': 'Все поля обязательны'}), 400
+        
+        conn = get_db()
+        cursor = conn.cursor()
+        
+        cursor.execute('SELECT id FROM players WHERE phone = ?', (phone,))
+        existing = cursor.fetchone()
+        
+        if existing:
+            conn.close()
+            return jsonify({
+                'status': 'ok',
+                'id': existing['id'],
+                'message': 'Добро пожаловать назад!'
+            })
+        
+        cursor.execute('''
+            INSERT INTO players (name, lastname, phone) 
+            VALUES (?, ?, ?)
+        ''', (name, lastname, phone))
+        
         conn.commit()
+        player_id = cursor.lastrowid
         conn.close()
-        return jsonify({'status': 'ok', 'id': cursor.lastrowid})
-    except sqlite3.IntegrityError:
-        return jsonify({'status': 'error', 'message': 'Телефон уже зарегистрирован'}), 400
+        
+        return jsonify({
+            'status': 'ok',
+            'id': player_id,
+            'message': 'Регистрация успешна'
+        })
+        
+    except Exception as e:
+        print(f"❌ Ошибка регистрации: {e}")
+        return jsonify({'status': 'error', 'message': str(e)}), 500
 
 @app.route('/update_score', methods=['POST'])
 def update_score():
     try:
         data = request.json
         player_id = data.get('player_id')
-        game_number = data.get('game_number')  # 1, 2 или 3
-        score = data.get('score')
+        game = data.get('game')
+        score = data.get('score', 0)
         
-        if not player_id or not game_number or score is None:
+        print(f"📝 Получен запрос: player_id={player_id}, game={game}, score={score}")
+        
+        if not player_id or not game:
             return jsonify({'status': 'error', 'message': 'Missing data'}), 400
         
-        conn = sqlite3.connect('players.db')
+        if game not in ['game1', 'game2', 'game3']:
+            return jsonify({'status': 'error', 'message': 'Invalid game'}), 400
+        
+        conn = get_db()
         cursor = conn.cursor()
         
-        # Обновляем счет в зависимости от игры
-        if game_number == 1:
-            cursor.execute('UPDATE players SET game1_score = ? WHERE id = ?', (score, player_id))
-        elif game_number == 2:
-            cursor.execute('UPDATE players SET game2_score = ? WHERE id = ?', (score, player_id))
-        elif game_number == 3:
-            cursor.execute('UPDATE players SET game3_score = ? WHERE id = ?', (score, player_id))
+        # Сначала проверяем, существует ли игрок
+        cursor.execute('SELECT id FROM players WHERE id = ?', (player_id,))
+        if not cursor.fetchone():
+            conn.close()
+            return jsonify({'status': 'error', 'message': 'Player not found'}), 404
         
+        # Обновляем счет
+        query = f'''
+            UPDATE players 
+            SET {game}_score = MAX({game}_score, ?),
+                total_score = COALESCE(game1_score, 0) + COALESCE(game2_score, 0) + COALESCE(game3_score, 0)
+            WHERE id = ?
+        '''
+        
+        cursor.execute(query, (score, player_id))
         conn.commit()
-        
-        # Получаем общий счет
-        cursor.execute('SELECT game1_score, game2_score, game3_score FROM players WHERE id = ?', (player_id,))
-        result = cursor.fetchone()
-        total_score = sum(filter(None, [result[0], result[1], result[2]])) if result else 0
-        
         conn.close()
         
-        return jsonify({
-            'status': 'ok',
-            'total_score': total_score,
-            'message': f'Score for game {game_number} updated!'
-        })
+        print(f"✅ Счет обновлен: player {player_id}, {game} = {score}")
+        
+        return jsonify({'status': 'ok', 'message': 'Score updated'})
+        
+    except Exception as e:
+        print(f"❌ Ошибка: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+@app.route('/get_leaderboard', methods=['GET'])
+def get_leaderboard():
+    try:
+        conn = get_db()
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            UPDATE players 
+            SET total_score = COALESCE(game1_score, 0) + COALESCE(game2_score, 0) + COALESCE(game3_score, 0)
+        ''')
+        conn.commit()
+        
+        cursor.execute('''
+            SELECT id, name, lastname, 
+                   COALESCE(game1_score, 0) as game1_score,
+                   COALESCE(game2_score, 0) as game2_score,
+                   COALESCE(game3_score, 0) as game3_score,
+                   COALESCE(total_score, 0) as total_score
+            FROM players 
+            WHERE COALESCE(game1_score, 0) > 0 
+               OR COALESCE(game2_score, 0) > 0 
+               OR COALESCE(game3_score, 0) > 0
+            ORDER BY total_score DESC, game1_score DESC
+            LIMIT 10
+        ''')
+        
+        players = cursor.fetchall()
+        conn.close()
+        
+        result = []
+        for i, player in enumerate(players, 1):
+            result.append({
+                'rank': i,
+                'id': player['id'],
+                'name': f"{player['name']} {player['lastname']}",
+                'game1': player['game1_score'],
+                'game2': player['game2_score'],
+                'game3': player['game3_score'],
+                'total': player['total_score']
+            })
+        
+        return jsonify({'status': 'ok', 'leaderboard': result})
+        
+    except Exception as e:
+        print(f"❌ Ошибка: {e}")
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+@app.route('/get_player_stats/<int:player_id>', methods=['GET'])
+def get_player_stats(player_id):
+    try:
+        conn = get_db()
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            SELECT name, lastname, 
+                   COALESCE(game1_score, 0) as game1_score,
+                   COALESCE(game2_score, 0) as game2_score,
+                   COALESCE(game3_score, 0) as game3_score,
+                   COALESCE(total_score, 0) as total_score
+            FROM players 
+            WHERE id = ?
+        ''', (player_id,))
+        
+        player = cursor.fetchone()
+        conn.close()
+        
+        if player:
+            return jsonify({
+                'status': 'ok',
+                'player': {
+                    'name': f"{player['name']} {player['lastname']}",
+                    'game1': player['game1_score'],
+                    'game2': player['game2_score'],
+                    'game3': player['game3_score'],
+                    'total': player['total_score']
+                }
+            })
+        
+        return jsonify({'status': 'error', 'message': 'Player not found'}), 404
         
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
