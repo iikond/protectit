@@ -149,13 +149,14 @@ function draw() {
     ctx.restore();
     
     // Добавляем эффект сканирования
+// Горизонтальные линии (поперек canvas)
     ctx.beginPath();
     ctx.strokeStyle = 'rgba(220, 112, 0, 0.3)';
     ctx.lineWidth = 2;
     for (let i = 0; i < 3; i++) {
         ctx.beginPath();
-        ctx.moveTo(0, canvas.height/2 + i * 30 - 30);
-        ctx.lineTo(canvas.width, canvas.height/2 + i * 30 - 30);
+        ctx.moveTo(canvas.width / 4 * (i + 1), 0);
+        ctx.lineTo(canvas.width / 4 * (i + 1), canvas.height);
         ctx.stroke();
     }
     

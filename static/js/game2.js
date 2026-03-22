@@ -88,4 +88,17 @@ function endGame(msg) {
     document.getElementById('gameOverMsg').innerHTML = `<span style="color:#DC7000">${msg}</span>`;
 }
 
+const nextBtn = document.querySelector('button[href="stage3"]');
+if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+        if (gameActive) {
+            if (confirm('Игра ещё не закончена! Перейти на следующий уровень?')) {
+                window.location.href = 'stage3';
+            }
+        } else {
+            window.location.href = 'stage3';
+        }
+    });
+}
+
 startGame();
